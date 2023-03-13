@@ -5,21 +5,21 @@ import { Column } from "primereact/column";
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
 import { Button } from "primereact/button";
-import { Calendar } from "primereact/calendar";
+
 import { CustomerService } from "../service/CustomerService";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import "../App.css";
+
 
 const Product = () => {
- 
   const [selectedCustomers, setSelectedCustomers] = useState(null);
   const navigate = useNavigate();
-  const [posts, setPosts] = useState([]);
+  const [bookmark, setBookmark] = useState([]);
+  let [id, setdocumentId] = useState("");
 
   const [filters, setFilters] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    filename: {
+    docName: {
       operator: FilterOperator.AND,
       constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
     },
@@ -50,7 +50,7 @@ const Product = () => {
     activity: { value: null, matchMode: FilterMatchMode.BETWEEN },
   });
   const [globalFilterValue, setGlobalFilterValue] = useState("");
-
+ 
 
   const statuses = [
     "Updated",
@@ -61,24 +61,75 @@ const Product = () => {
 
   const customerService = new CustomerService();
 
- 
+  
+  
   useEffect(() => {
-    axios
-      .get(`${process.env.REACT_APP_API_KEY}/document/approvedDocs`)
-      .then((res) => {
-        console.log(res,"///////////////////////////shivani");
-        setPosts(res.data);
-      });
-    console.log(posts, "./././././.shivania");
+    const fetchData = async () =>{
+     
+      try {
+        const {data: response} = await axios.get(`${process.env.REACT_APP_API_KEY}/document/list`);
+        setBookmark(response);
+      } catch (error) {
+        console.error(error.message);
+      }
+      
+     }
+
+    fetchData();
   }, []);
 
-  const getCustomers = (data) => {
-    console.log(data, "/././././");
-    return [...(data || [])].map((d) => {
-      d.date = new Date(d.date);
-      return d;
-    });
+
+  const DOC_FILE_URL = `${process.env.REACT_APP_API_KEY}/document/downloadFile/${id}`;
+
+  //BOOKMARK DOCUMENT DOWNLOAD
+  
+
+  const downloadFileAtURL = (url) => {
+    const fileName = url.split("/").pop();
+    const aTag = document.createElement("a");
+    aTag.href = url;
+    aTag.setAttribute("download", fileName);
+    document.body.appendChild(aTag);
+    aTag.click();
+    aTag.remove();
   };
+
+
+
+
+
+
+
+  const BookmarkTemplate = (rowData) => {
+    console.log(rowData, " single row data...@@");
+    setdocumentId(rowData.bookmark);
+
+
+    return (
+      <span className={`customer-badge status-${rowData.status}`}>
+           
+       
+        <Button
+        style={{
+          backgroundColor: "white",
+          height: "30px",
+          width: "30px",
+          color: "#203570",
+        }}
+        icon="pi pi-download"
+        onClick={() => {
+          downloadFileAtURL(DOC_FILE_URL);
+        }}
+        tooltip="Download "
+        tooltipOptions={{ className: "teal-tooltip", position: "bottom" }}
+        className="p-button-raised  p-button-text"
+      />
+
+
+      </span>
+    );
+  };
+
 
 
   const onGlobalFilterChange = (e) => {
@@ -98,11 +149,13 @@ const Product = () => {
           <InputText
             value={globalFilterValue}
             onChange={onGlobalFilterChange}
-            placeholder="Search"
+            placeholder="Keyword Search"
             className="p-inputtext-sm"
           />
         </span>
-       
+        {/* <NavLink to="/UploadDocument" className="link1">
+          <Button className="nextBtn p-button-sm">Upload Document</Button>
+        </NavLink> */}
       </div>
     );
   };
@@ -120,34 +173,6 @@ const Product = () => {
       <React.Fragment>
         <span>{rowData.reviewer}</span>
       </React.Fragment>
-    );
-  };
-
-
-  const dateBodyTemplate = (rowData) => {
-    let currentTimestamp = Date.now();
-    console.log(currentTimestamp); // get current timestamp
-    let date = new Intl.DateTimeFormat("en-US", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      // hour: "2-digit",
-      // minute: "2-digit",
-      // second: "2-digit",
-    }).format(currentTimestamp);
-    console.log(date, "'dsjcfsdjkshivani");
-    return date;
-  };
-
-  const dateFilterTemplate = (options) => {
-    return (
-      <Calendar
-        value={options.value}
-        onChange={(e) => options.filterCallback(e.value, options.index)}
-        dateFormat="mm/dd/yy"
-        placeholder="mm/dd/yyyy"
-        mask="99/99/9999"
-      />
     );
   };
 
@@ -179,25 +204,23 @@ const Product = () => {
 
   const header = renderHeader();
 
-  const actionBodyTemplate = (rowData) => {
-    return (
-      <React.Fragment>
-        <Button
-          style={{ backgroundColor: "#203570", height: 30, width: 30 }}
-          icon="pi pi-file"
-          className="p-button-rounded p-button-sm mr-2"
-          onClick={() => editProduct(rowData)}
-        />
-        {/* <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteProduct(rowData)} /> */}
-      </React.Fragment>
-    );
-  };
+  //   const actionBodyTemplate = (rowData) => {
+  //     return (
+  //       <React.Fragment>
+  //         <Button
+  //           icon="pi pi-file"
+  //           className="p-button-rounded p-button-sm mr-2"
+  //           onClick={() => editProduct(rowData)}
+  //         />
+  //         {/* <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteProduct(rowData)} /> */}
+  //       </React.Fragment>
+  //     );
+  //   };
 
   const editProduct = (product) => {
     customerService.docDataById = product;
     console.log(customerService.docDataById, "./././././././");
     navigate("/Version/" + product.id);
-
     console.log(product, " document data by id.....");
   };
 
@@ -205,7 +228,7 @@ const Product = () => {
     <div className="datatable-doc-demo">
       <div className="card">
         <DataTable
-          value={posts}
+          value={bookmark}
           paginator
           className="p-datatable-customers"
           header={header}
@@ -214,78 +237,69 @@ const Product = () => {
           rowsPerPageOptions={[10, 25, 50]}
           dataKey="id"
           rowHover
-          size="small"
           selection={selectedCustomers}
           onSelectionChange={(e) => setSelectedCustomers(e.value)}
           filters={filters}
           filterDisplay="menu"
           responsiveLayout="scroll"
           globalFilterFields={[
-            "filename",
+            "docName",
             "description",
             "reviewer",
+            // "representative.name",
             "balance",
             "status",
           ]}
           emptyMessage="No documents found."
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
         >
+         
           <Column
             field="docName"
-            header="Document"
+            header="DocumentName"
             sortable
             filter
             filterPlaceholder="Search by name"
-            style={{ minWidth: "10rem" }}
+            style={{ minWidth: "20rem" }}
+            
           />
 
           <Column
-            field="docData"
-            header="Description"
-            sortable
-            filterField="description"
-            style={{ minWidth: "10rem" }}
-            body={countryBodyTemplate}
-            filter
-            filterPlaceholder="Search by description"
-          />
-          {/* <Column field="reviewer" sortable header="Reviewer"></Column> */}
-          <Column
-            field="reviewer"
+            field="Reviewer"
             header="Reviewer"
             sortable
             filterField="reviewer"
-            style={{ minWidth: "10rem" }}
+            style={{ minWidth: "20rem" }}
             body={countryTemplate}
             filter
-            filterPlaceholder="Search by Reviewer"
+            filterPlaceholder="Search by reviewer"
           />
 
-          {/* <Column
-            field='status'
+          <Column
+            field="status"
             header="Status"
             sortable
             filterMenuStyle={{ width: "14rem" }}
-            style={{ minWidth: "10rem" }}
+            style={{ minWidth: "20rem" }}
             body={statusBodyTemplate}
             filter
             filterElement={statusFilterTemplate}
-          /> */}
-
-          <Column
-            field="timestamp"
-            header="Sent On"
-            sortable
-            currentTimestamp
-            filterField="date"
-            dataType="date"
-            body={dateBodyTemplate}
-            style={{ minWidth: "8rem" }}
-            filter
-            filterElement={dateFilterTemplate}
           />
 
-        
+
+
+            
+    <Column
+            // field="status"
+            header="Action"
+            sortable
+            filterMenuStyle={{ width: "14rem" }}
+            style={{ minWidth: "10rem" }}
+            body={BookmarkTemplate }
+            filter
+            // filterElement={statusFilterTemplate}
+          />
+          
         </DataTable>
       </div>
     </div>
@@ -293,4 +307,3 @@ const Product = () => {
 };
 
 export default Product;
-

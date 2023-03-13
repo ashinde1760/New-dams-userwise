@@ -10,11 +10,10 @@ import { CustomerService } from "../service/CustomerService";
 import { NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-function Product()  {
- const [selectedCustomers, setSelectedCustomers] = useState(null);
-  
-  const [users,  setUsers] = useState([]);
-  
+function Product() {
+  const [selectedCustomers, setSelectedCustomers] = useState(null);
+  const [loading] = useState(false);
+  const [users, setUsers] = useState([]);
 
   const [filters, setFilters] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -27,15 +26,12 @@ function Product()  {
       operator: FilterOperator.AND,
       constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
     },
-   
 
     emailId: {
       operator: FilterOperator.AND,
       constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
     },
 
-
-    
     createdBy: {
       operator: FilterOperator.AND,
       constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
@@ -60,36 +56,41 @@ function Product()  {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   // const [loading, setLoading] = useState(true);
 
-  const statuses = [
-    "Active",
-    "Deactive",
-   
-  ];
+  const statuses = ["Active", "Deactive"];
+  const [products2, setProducts2] = useState(null);
 
   const customerService = new CustomerService();
 
-
-
   useEffect(() => {
-    const fetchData = async () =>{
-     
+    const fetchData = async () => {
       try {
-        const {data: response} = await axios.get(`${process.env.REACT_APP_API_KEY}/dam/user/list`);
+        const { data: response } = await axios.get(
+          `${process.env.REACT_APP_API_KEY}/dam/user/list`
+        );
         setUsers(response);
       } catch (error) {
         console.error(error.message);
       }
-      
-      
-    }
+    };
 
     fetchData();
   }, []);
 
+  function deleteUser(rowData) {
+    console.log(rowData, "dete////");
+    fetch(
+      `${process.env.REACT_APP_API_KEY}/dam/user/delete/${rowData.id}`,
 
-
-
- 
+      {
+        method: "DELETE",
+      }
+    ).then((result) => {
+      result.json().then((resp) => {
+        console.warn(resp);
+        window.location.reload();
+      });
+    });
+  }
 
   const onGlobalFilterChange = (e) => {
     const value = e.target.value;
@@ -102,14 +103,7 @@ function Product()  {
 
   const renderHeader = () => {
     return (
-
-      
-    
-      
       <div className="flex justify-content-between align-items-center">
-
-     
-        
         <span className="p-input-icon-left">
           <i className="pi pi-search" />
           <InputText
@@ -119,9 +113,14 @@ function Product()  {
             className="p-inputtext-sm"
           />
         </span>
-         <NavLink to="/UserDetails" className="link1">
-          <Button style={{ backgroundColor:"#203570"}} className=" p-button-sm">Add New User</Button>
-        </NavLink> 
+        <NavLink to="/UserDetails" className="link1">
+          <Button
+            style={{ backgroundColor: "#203570" }}
+            className=" p-button-sm"
+          >
+            Add New User
+          </Button>
+        </NavLink>
       </div>
     );
   };
@@ -141,9 +140,6 @@ function Product()  {
       </React.Fragment>
     );
   };
-
-
-
 
   const createdByTemplate = (rowData) => {
     return (
@@ -175,7 +171,6 @@ function Product()  {
     );
   };
 
-
   const dateBodyTemplate = (rowData) => {
     let currentTimestamp = Date.now();
     // console.log(currentTimestamp); // get current timestamp
@@ -183,10 +178,9 @@ function Product()  {
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
-     
     }).format(currentTimestamp);
-   
-    return (date);
+
+    return date;
   };
   const dateFilterTemplate = (options) => {
     return (
@@ -206,15 +200,66 @@ function Product()  {
 
   const header = renderHeader();
 
- 
+  const DeleteUserTemplate = (rowData) => {
+    console.log(rowData, "action body.....");
+    return (
+      <div>
+        <Button
+          style={{ height: "20px", width: "20px", color: "#203570" }}
+          icon="pi pi-trash"
+          onClick={() => deleteUser(rowData)}
+          className="p-button-rounded p-button-text"
+        />
+      </div>
+    );
+  };
+
+  //EDIT NOTES
+
+  function updateUser(e) {
+    if (e.which === 13) {
+      console.log(e, " enter event");
+    }
+  }
+
+  const onRowEditComplete = (e) => {
+    console.log(e, " data to be edited");
+
+    const notes = e.newData;
+
+    fetch(`${process.env.REACT_APP_API_KEY}/dam/user/${e.data.id}`, {
+      method: "PUT",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(notes),
+    }).then((result) => {
+      setProducts2(result);
+      window.location.reload(false);
+      console.log("rsult", result);
+
+      result.json().then((resp) => {
+        console.warn(resp);
+      });
+    });
+  };
+  const textEditor = (options) => {
+    return (
+      <InputText
+        type="text"
+        value={options.value}
+        onChange={(e) => options.editorCallback(e.target.value)}
+      />
+    );
+  };
 
   return (
     <div className="datatable-doc-demo">
-         <Button
+      <Button
         icon=" pi pi-user"
-       style={{ backgroundColor: "white" }}
+        style={{ backgroundColor: "white" }}
         label="User Management"
-        
         className="p-button-raised p-button-secondary p-button-text p-button-sm"
       />
       <br />
@@ -223,32 +268,34 @@ function Product()  {
         <DataTable
           value={users}
           paginator
+          rowHover
+          editMode="row"
+          dataKey="id"
+          onRowEditComplete={onRowEditComplete}
+          responsiveLayout="scroll"
+          selection={selectedCustomers}
+          onSelectionChange={(e) => setSelectedCustomers(e.value)}
+          loading={loading}
           className="p-datatable-customers"
           header={header}
           rows={12}
           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
           rowsPerPageOptions={[10, 25, 50]}
-          dataKey="id"
-          rowHover
-          selection={selectedCustomers}
-          onSelectionChange={(e) => setSelectedCustomers(e.value)}
           filters={filters}
           filterDisplay="menu"
-          responsiveLayout="scroll"
           globalFilterFields={[
             "userName",
             "userRole",
             "createdBy",
             "emailId",
             "createdBy",
-            
+
             "balance",
             "status",
           ]}
-          emptyMessage="No documents found."
+          emptyMessage="No Users added."
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
         >
-        
           <Column
             field="userName"
             header="User Name"
@@ -258,7 +305,7 @@ function Product()  {
             style={{ minWidth: "10rem" }}
             filterField="userName"
             body={countryBodyTemplate}
-         
+            editor={(options) => textEditor(options)}
           />
           <Column
             field="userRole"
@@ -268,10 +315,8 @@ function Product()  {
             filterField="userRole"
             filterPlaceholder="Search by name"
             style={{ minWidth: "10rem" }}
+            editor={(options) => textEditor(options)}
           />
-
-
-
 
           <Column
             field="emailId"
@@ -282,10 +327,10 @@ function Product()  {
             body={countryTemplate}
             filter
             filterPlaceholder="Search by email"
+            editor={(options) => textEditor(options)}
           />
-          
- 
-            <Column
+
+          <Column
             field="createdBy"
             header="Created By"
             sortable
@@ -294,9 +339,10 @@ function Product()  {
             filterField="createdBy"
             filterPlaceholder="Search by Creater"
             style={{ minWidth: "10rem" }}
+            editor={(options) => textEditor(options)}
           />
 
-           <Column
+          <Column
             field="status"
             header="Status"
             sortable
@@ -305,9 +351,9 @@ function Product()  {
             body={statusBodyTemplate}
             filter
             filterElement={statusFilterTemplate}
+            editor={(options) => textEditor(options)}
           />
-          
-          
+
           <Column
             field="createdOn"
             header="Sent On"
@@ -319,17 +365,19 @@ function Product()  {
             style={{ minWidth: "8rem" }}
             filter
             filterElement={dateFilterTemplate}
+            editor={(options) => textEditor(options)}
           />
+          <Column header="Edit" rowEditor></Column>
 
-
-
-
-
+          <Column
+            header="Delete"
+            headerStyle={{ width: "2rem" }}
+            body={DeleteUserTemplate}
+          />
         </DataTable>
       </div>
     </div>
   );
-};
+}
 
 export default Product;
-

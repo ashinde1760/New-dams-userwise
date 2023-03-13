@@ -300,7 +300,7 @@ const Product = () => {
           />
 
           <Column
-            header="View Document"
+            header="View"
             body={(e) => actionBodyTemplate(e)}
             exportable={false}
            

@@ -11,15 +11,15 @@ import { NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../App.css";
 
-const Product = () => {
- 
+export default function AuditHistory ()  {
+
   const [selectedCustomers, setSelectedCustomers] = useState(null);
   const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
 
   const [filters, setFilters] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    filename: {
+    userName: {
       operator: FilterOperator.AND,
       constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
     },
@@ -61,15 +61,17 @@ const Product = () => {
 
   const customerService = new CustomerService();
 
- 
+
+
+
   useEffect(() => {
     axios
-      .get(`${process.env.REACT_APP_API_KEY}/document/approvedDocs`)
+      .get(`${process.env.REACT_APP_API_KEY}/AuditHistory/list`)
       .then((res) => {
-        console.log(res,"///////////////////////////shivani");
+        console.log(res);
         setPosts(res.data);
       });
-    console.log(posts, "./././././.shivania");
+    console.log(posts, "./././././.aaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
   }, []);
 
   const getCustomers = (data) => {
@@ -80,6 +82,7 @@ const Product = () => {
     });
   };
 
+  
 
   const onGlobalFilterChange = (e) => {
     const value = e.target.value;
@@ -102,7 +105,7 @@ const Product = () => {
             className="p-inputtext-sm"
           />
         </span>
-       
+     
       </div>
     );
   };
@@ -124,19 +127,25 @@ const Product = () => {
   };
 
 
+
   const dateBodyTemplate = (rowData) => {
     let currentTimestamp = Date.now();
-    console.log(currentTimestamp); // get current timestamp
+    // console.log(currentTimestamp); // get current timestamp
     let date = new Intl.DateTimeFormat("en-US", {
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
-      // hour: "2-digit",
-      // minute: "2-digit",
-      // second: "2-digit",
+     
     }).format(currentTimestamp);
-    console.log(date, "'dsjcfsdjkshivani");
+    // console.log(date, "'dsjcfsdjkshivani");
     return date;
+    // let timestamp
+    // const date = new Date(timestamp)
+    // // const date6 = moment().subtract(10, 'days').calendar(); // 02/04/2023
+    // const formatDate = moment(date).format("DD/MM/YYYY")
+    // return(
+    //   <div>{formatDate}</div>
+    // )
   };
 
   const dateFilterTemplate = (options) => {
@@ -148,6 +157,7 @@ const Product = () => {
         placeholder="mm/dd/yyyy"
         mask="99/99/9999"
       />
+      
     );
   };
 
@@ -202,7 +212,19 @@ const Product = () => {
   };
 
   return (
+    // <Card>
+
+
     <div className="datatable-doc-demo">
+       <Button
+        icon=" pi pi-history"
+       style={{ backgroundColor: "white" }}
+        label="Audit History"
+        
+        className="p-button-raised p-button-secondary p-button-text p-button-sm"
+      />
+      <br />
+      <br />
       <div className="card">
         <DataTable
           value={posts}
@@ -221,7 +243,7 @@ const Product = () => {
           filterDisplay="menu"
           responsiveLayout="scroll"
           globalFilterFields={[
-            "filename",
+            "userName",
             "description",
             "reviewer",
             "balance",
@@ -231,8 +253,8 @@ const Product = () => {
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
         >
           <Column
-            field="docName"
-            header="Document"
+            field="userName"
+            header="UserName"
             sortable
             filter
             filterPlaceholder="Search by name"
@@ -240,7 +262,7 @@ const Product = () => {
           />
 
           <Column
-            field="docData"
+            field="description"
             header="Description"
             sortable
             filterField="description"
@@ -250,19 +272,19 @@ const Product = () => {
             filterPlaceholder="Search by description"
           />
           {/* <Column field="reviewer" sortable header="Reviewer"></Column> */}
-          <Column
-            field="reviewer"
-            header="Reviewer"
+          {/* <Column
+            field="activity"
+            header="Activity"
             sortable
             filterField="reviewer"
             style={{ minWidth: "10rem" }}
             body={countryTemplate}
             filter
             filterPlaceholder="Search by Reviewer"
-          />
+          /> */}
 
           {/* <Column
-            field='status'
+            field="status"
             header="Status"
             sortable
             filterMenuStyle={{ width: "14rem" }}
@@ -273,8 +295,8 @@ const Product = () => {
           /> */}
 
           <Column
-            field="timestamp"
-            header="Sent On"
+            field="createdOn"
+            header="createdOn"
             sortable
             currentTimestamp
             filterField="date"
@@ -284,13 +306,18 @@ const Product = () => {
             filter
             filterElement={dateFilterTemplate}
           />
-
-        
+{/* 
+          <Column
+            header="View Document"
+            body={(e) => actionBodyTemplate(e)}
+            exportable={false}
+            // style={{ minWidth: "rem" }}
+          ></Column> */}
         </DataTable>
+        
+
       </div>
     </div>
+    // </Card>
   );
 };
-
-export default Product;
-

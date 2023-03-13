@@ -4,15 +4,19 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
+import { Button } from "primereact/button";
 
 import { CustomerService } from "../service/CustomerService";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Navigate, NavLink } from "react-router-dom";
+
 
 const Product = () => {
   const [selectedCustomers, setSelectedCustomers] = useState(null);
   const navigate = useNavigate();
   const [bookmark, setBookmark] = useState([]);
+  let [id, setdocumentId] = useState("");
 
   const [filters, setFilters] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -58,24 +62,7 @@ const Product = () => {
 
   const customerService = new CustomerService();
 
-  // useEffect(() => {
-  //   customerService.getAllDocument().then((data2) => {
-  //     setCustomers(getCustomers(data2));
-  //     setLoading(false);
-  //     console.log(data2,"shivani")
-  //   });
-  // }, []);
-
-  // useEffect(() => {
-  //   console.log("jkhkjhjhjhkhkh..........");
-  //   axios
-  //     .get(`http://192.168.1.61:8082/document/list `)
-  //     .then((res) => {
-  //       console.log(res, "./././././.aaaaaaajkkj");
-
-  //       setBookmark(res.data);
-  //     });
-  // });
+  
   
   useEffect(() => {
     const fetchData = async () =>{
@@ -93,33 +80,58 @@ const Product = () => {
   }, []);
 
 
+  const DOC_FILE_URL = `${process.env.REACT_APP_API_KEY}/document/downloadFile/${id}`;
+
+  //BOOKMARK DOCUMENT DOWNLOAD
+  
+
+  const downloadFileAtURL = (url) => {
+    const fileName = url.split("/").pop();
+    const aTag = document.createElement("a");
+    aTag.href = url;
+    aTag.setAttribute("download", fileName);
+    document.body.appendChild(aTag);
+    aTag.click();
+    aTag.remove();
+  };
 
 
 
-  //   axios
-  //   .get(`http://192.168.1.59:8080/sample/getDocById/${id}`)
-  //   .then((res) => {
-  //     console.log(res.data[0].bookmarked[0], "document data1234");
-  //     setChangeText(res.data[0].bookmarked[0]);
 
-  //     console.log(changeText, "bookmarked....!!!!");
-  //   });
 
-  //   const getCustomers = (data) => {
-  //     console.log(data,"/././././");
-  //     return [...(data || [])].map((d) => {
-  //       d.date = new Date(d.date);
-  //       return d;
-  //     });
-  //   };
 
-  //   const formatDate = (value) => {
-  //     return value.toLocaleDateString("en-US", {
-  //       day: "2-digit",
-  //       month: "2-digit",
-  //       year: "numeric",
-  //     });
-  //   };
+
+  const BookmarkTemplate = (rowData) => {
+    console.log(rowData, " single row data...@@");
+    setdocumentId(rowData.docId);
+
+
+    return (
+      <span className={`customer-badge status-${rowData.status}`}>
+           
+       
+        <Button
+        style={{
+          backgroundColor: "white",
+          height: "30px",
+          width: "30px",
+          color: "#203570",
+        }}
+        icon="pi pi-download"
+        onClick={() => {
+          downloadFileAtURL(DOC_FILE_URL);
+        }}
+        tooltip="Download "
+        tooltipOptions={{ className: "teal-tooltip", position: "bottom" }}
+        className="p-button-raised  p-button-text"
+      />
+
+
+      </span>
+    );
+  };
+
+
 
   const onGlobalFilterChange = (e) => {
     const value = e.target.value;
@@ -214,6 +226,16 @@ const Product = () => {
   };
 
   return (
+<>
+{/* 
+    <NavLink to="/version" className="link1">
+    <Button
+      icon=" pi pi-chevron-circle-left  "
+      style={{ backgroundColor: "white" }}
+      label="Bookmark Document"
+      className="p-button-raised p-button-secondary p-button-text p-button-sm"
+    />
+  </NavLink> */}
     <div className="datatable-doc-demo">
       <div className="card">
         <DataTable
@@ -242,98 +264,7 @@ const Product = () => {
           emptyMessage="No documents found."
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
         >
-          {/* paginator
-          className="p-datatable-customers"
-          header={header}
-          rows={3}
-          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-          rowsPerPageOptions={[10, 25, 50]}
-          dataKey="id"
-          rowHover
-          selection={selectedCustomers}
-          onSelectionChange={(e) => setSelectedCustomers(e.value)}
-          filters={filters}
-          filterDisplay="menu"
-          responsiveLayout="scroll"
-          globalFilterFields={[
-            "name",
-            "description",
-            "reviewer",
-            // "representative.name",
-            "balance",
-            "status",
-          ]}
-          emptyMessage="No documents found."
-          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" */}
-
-          {/* <Column
-            field="name"
-            header="DocumentName"
-            sortable
-            filter
-            filterPlaceholder="Search by name"
-            style={{ minWidth: "10rem" }}
-          />
-          <Column
-            field="description"
-            header="Description"
-            sortable
-            filterField="description"
-            style={{ minWidth: "10rem" }}
-            body={countryBodyTemplate}
-            filter
-            filterPlaceholder="Search by country"
-          />
-
-            <Column
-            field="reviewer"
-             field="clientname"
-            header="Reviewer"
-            sortable
-            filterField="reviewer"
-            style={{ minWidth: "10rem" }}
-            body={countryTemplate}
-            filter
-            filterPlaceholder="Search by country"
-          />
-
-
          
-        
-          <Column
-            field="status"
-            header="Status"
-            sortable
-            filterMenuStyle={{ width: "14rem" }}
-            style={{ minWidth: "10rem" }}
-            body={statusBodyTemplate}
-            filter
-            filterElement={statusFilterTemplate}
-          />
-          
-          
-
-            <Column
-            field="date"
-            header="Sent On"
-            sortable
-            filterField="date"
-            dataType="date"
-            style={{ minWidth: "8rem" }}
-            body={dateBodyTemplate}
-            filter
-            filterElement={dateFilterTemplate}
-          />
-
-
-          <Column
-          header="View Document"
-            body={actionBodyTemplate}
-            exportable={false}
-            // style={{ minWidth: "rem" }}
-          ></Column> */}
-          {/* 
-          <Column field="id" sortable header="userId"></Column> */}
           <Column
             field="docName"
             header="DocumentName"
@@ -365,9 +296,25 @@ const Product = () => {
             filter
             filterElement={statusFilterTemplate}
           />
+
+
+
+            
+            <Column
+          
+            header="Action"
+            sortable
+            filterMenuStyle={{ width: "14rem" }}
+            style={{ minWidth: "10rem" }}
+            body={BookmarkTemplate }
+            filter
+            // filterElement={statusFilterTemplate}
+          />
+          
         </DataTable>
       </div>
     </div>
+    </>
   );
 };
 

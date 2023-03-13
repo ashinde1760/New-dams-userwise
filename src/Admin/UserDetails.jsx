@@ -20,13 +20,6 @@ function UserDetails() {
 
   const cities = [{ name: "Admin" }, { name: "viewer" }, { name: "Reviewer" }];
 
-  
-
-  // const onCityChange = (e) => {
-  //   // console.log(e.target.value.name);
-  //   setUserRole(e.target.value.name);
-  // };
-
   const onSubmit = (e) => {
     e.preventDefault();
     console.log("refresh prevented");
@@ -57,37 +50,41 @@ function UserDetails() {
         console.warn("result...!!!", result);
         result.json().then((resp) => {
           console.warn("resp", resp);
+         
         });
         toast.current.show({
           severity: "success",
           summary: "User Added",
           detail: "User Added Successfully",
-          life: 3000,
+          life: 6000,
+          
         });
-        navigate("/UserDetails")
+        //  navigate("/role")
       } else {
         toast.current.show({
           severity: "warn",
           summary: "User Not Added",
           detail: "Error while Adding User",
-          life: 3000,
+          life: 6000,
         });
-        navigate("/UserDetails")
+        
 
       }
+
+
     },
     (error)=>{
       toast.current.show({
         severity: "error",
         summary: "User Not Added",
         detail: "Error while Adding User",
-        life: 3000,
+        life: 6000,
       });
-      navigate("/UserDetails")
-
+   
     });
     navigate("/role")
   }
+ 
   return (
     <div>
       <Toast ref={toast} />
@@ -103,8 +100,8 @@ function UserDetails() {
       <br />
       <br />
 
-      <Card style={{ height:"430px"}}>
-        &nbsp; &nbsp;
+      <Card style={{ height:"370px"}}>
+        {/* &nbsp; &nbsp; */}
         <label>
           <b>User Details</b>
         </label>
@@ -117,7 +114,7 @@ function UserDetails() {
               borderLeft: "9px solid #49ABA0 ",
               backgroundColor: "#F3F3F3",
               width: "950px",
-              height:"230px"
+              height:"240px"
             
             }}
           >
@@ -231,7 +228,7 @@ function UserDetails() {
             {/* </div> */}
           </Card>
           <br />
-          <br />
+          {/* <br /> */}
 
           <Button
             style={{ marginLeft: "84%" }}
@@ -250,7 +247,9 @@ function UserDetails() {
             type="button"
             onClick={saveUser}
             className="p-button-outlined p-button-sm"
+            
           />
+          
         </form>
       </Card>
     </div>
@@ -258,3 +257,8 @@ function UserDetails() {
 }
 
 export default UserDetails;
+
+
+
+
+

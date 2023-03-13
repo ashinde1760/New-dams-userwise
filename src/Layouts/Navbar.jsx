@@ -62,7 +62,7 @@ const Navbar = () => {
             aria-label="User"
           />
 
-          <Button icon="pi pi-logout"  label="Logout" onClick={Logout}></Button>
+          <Button icon="pi pi-logout " className="  p-button-sm p-button-info"   label="Logout" onClick={Logout}></Button>
 
 
           {/* <Button icon="pi pi-user" className="p-button-rounded p-button-info"  aria-label="User" /> */}

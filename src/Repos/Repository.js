@@ -42,22 +42,30 @@ function Display() {
     onSubmit: (data) => {
       
       console.log(data, "user data");
-      if(data.username==='Admin'){
+      if(data.username==='Admin' && data.password==="admin"){
         localStorage.setItem('role',"Admin")
         navigate("/dashboardMain");
-      }else if(data.username==='Reviewer'){
+      }else if(data.username==='Reviewer' && data.password==="reviewer"){
         localStorage.setItem('role','Reviewer')
-        navigate("/dashboardMain");
+        navigate("/reviewermain");
 
+      }
+      else if(data.username==='Viewer' && data.password==="viewer"){
+        localStorage.setItem('role','Viewer')
+        navigate("/viewermain");
       }
     },
   });
 
   return (
     <div>
+      
       <Card className="loginCard">
+      <h1>Login Here......</h1>
         <form onSubmit={formik.handleSubmit} className="p-fluid loginForm">
+          
           <div>
+
             <label htmlFor="name">username</label>
 
             <InputText

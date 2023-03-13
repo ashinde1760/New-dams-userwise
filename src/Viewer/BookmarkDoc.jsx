@@ -1,11 +1,10 @@
 import React, { Component } from "react";
 import { TabView, TabPanel } from "primereact/tabview";
 import { SplitButton } from "primereact/splitbutton";
-import Document from "./Document";
-import Bookmark from "./Bookmark";
-import Approved from "./Approved";
-import SavedAsDraft from "./SavedAsDraft"
 
+import BookmarkDemo from "./BookmarkDemo";
+import BookmarkSection from "./BookmarkSection"
+import { Card } from "primereact/card";
 
 export default class DashboardMain extends Component {
   constructor(props) {
@@ -85,21 +84,17 @@ export default class DashboardMain extends Component {
     return (
       <div className="tabview-demo">
         <div className="card">
-          <TabView  className="tabview-header-icon innerTab">
-            <TabPanel header="Sent for Review" leftIcon=" pi pi-file">
-              <Document className="innerTab"></Document>
-             
+     
+          <TabView  className="tabview-header-icon">
+           
+            <TabPanel    header="Bookmark Document " leftIcon="pi pi-bookmark">
+              <BookmarkDemo></BookmarkDemo>
             </TabPanel>
-            {/* <TabPanel    header="Approved Document" leftIcon="">
-              <Approved></Approved>
-            </TabPanel> */}
-            <TabPanel    header="Bookmarks" leftIcon= " pi pi-bookmark">
-              <Bookmark className="innerTab"></Bookmark>
-            </TabPanel>
-            <TabPanel    header="Save As Draft" leftIcon= " pi pi-save">
-              <SavedAsDraft className="innerTab"></SavedAsDraft>
+            <TabPanel    header="Bookmark Section" leftIcon="pi pi-bookmark">
+              <BookmarkSection></BookmarkSection>
             </TabPanel>
           </TabView>
+      
         </div>
       </div>
     );

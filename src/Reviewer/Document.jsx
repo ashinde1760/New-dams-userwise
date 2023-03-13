@@ -11,6 +11,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../App.css";
 
+
 const Product = () => {
  
   const [selectedCustomers, setSelectedCustomers] = useState(null);
@@ -61,15 +62,15 @@ const Product = () => {
 
   const customerService = new CustomerService();
 
- 
+
   useEffect(() => {
     axios
-      .get(`${process.env.REACT_APP_API_KEY}/document/approvedDocs`)
+      .get(`${process.env.REACT_APP_API_KEY}/sample/getAllDoc`)
       .then((res) => {
-        console.log(res,"///////////////////////////shivani");
+        console.log(res);
         setPosts(res.data);
       });
-    console.log(posts, "./././././.shivania");
+    console.log(posts, "./././././.aaaaaaaaa");
   }, []);
 
   const getCustomers = (data) => {
@@ -80,7 +81,7 @@ const Product = () => {
     });
   };
 
-
+  
   const onGlobalFilterChange = (e) => {
     const value = e.target.value;
     let _filters = { ...filters };
@@ -102,7 +103,14 @@ const Product = () => {
             className="p-inputtext-sm"
           />
         </span>
-       
+        {/* <NavLink to="/UploadDocuments" className="link1">
+          <Button
+            style={{ backgroundColor: "#203570" }}
+            className="nextBtn p-button-sm"
+          >
+            Upload Document
+          </Button>
+        </NavLink> */}
       </div>
     );
   };
@@ -110,7 +118,10 @@ const Product = () => {
   const countryBodyTemplate = (rowData) => {
     return (
       <React.Fragment>
-        <span>{rowData.description}</span>
+      <div style={{ overflow: "hidden",textOverflow:"ellipsis"}}>{rowData.description}</div>
+   
+        
+          
       </React.Fragment>
     );
   };
@@ -124,19 +135,19 @@ const Product = () => {
   };
 
 
+
   const dateBodyTemplate = (rowData) => {
     let currentTimestamp = Date.now();
-    console.log(currentTimestamp); // get current timestamp
+  
     let date = new Intl.DateTimeFormat("en-US", {
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
-      // hour: "2-digit",
-      // minute: "2-digit",
-      // second: "2-digit",
+     
     }).format(currentTimestamp);
-    console.log(date, "'dsjcfsdjkshivani");
+    
     return date;
+   
   };
 
   const dateFilterTemplate = (options) => {
@@ -148,6 +159,7 @@ const Product = () => {
         placeholder="mm/dd/yyyy"
         mask="99/99/9999"
       />
+      
     );
   };
 
@@ -188,7 +200,7 @@ const Product = () => {
           className="p-button-rounded p-button-sm mr-2"
           onClick={() => editProduct(rowData)}
         />
-        {/* <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteProduct(rowData)} /> */}
+   
       </React.Fragment>
     );
   };
@@ -196,12 +208,13 @@ const Product = () => {
   const editProduct = (product) => {
     customerService.docDataById = product;
     console.log(customerService.docDataById, "./././././././");
-    navigate("/Version/" + product.id);
+    navigate("/reviewerversion/" + product.id);
 
     console.log(product, " document data by id.....");
   };
 
   return (
+ 
     <div className="datatable-doc-demo">
       <div className="card">
         <DataTable
@@ -209,7 +222,7 @@ const Product = () => {
           paginator
           className="p-datatable-customers"
           header={header}
-          rows={10}
+          rows={8}
           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
           rowsPerPageOptions={[10, 25, 50]}
           dataKey="id"
@@ -231,7 +244,7 @@ const Product = () => {
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
         >
           <Column
-            field="docName"
+            field="filename"
             header="Document"
             sortable
             filter
@@ -240,16 +253,17 @@ const Product = () => {
           />
 
           <Column
-            field="docData"
+            field="description"
             header="Description"
             sortable
             filterField="description"
-            style={{ minWidth: "10rem" }}
+            style={{ minWidth: "10rem" ,textOverflow:"hidden"}}
             body={countryBodyTemplate}
             filter
+           
             filterPlaceholder="Search by description"
           />
-          {/* <Column field="reviewer" sortable header="Reviewer"></Column> */}
+       
           <Column
             field="reviewer"
             header="Reviewer"
@@ -261,8 +275,8 @@ const Product = () => {
             filterPlaceholder="Search by Reviewer"
           />
 
-          {/* <Column
-            field='status'
+          <Column
+            field="status"
             header="Status"
             sortable
             filterMenuStyle={{ width: "14rem" }}
@@ -270,7 +284,7 @@ const Product = () => {
             body={statusBodyTemplate}
             filter
             filterElement={statusFilterTemplate}
-          /> */}
+          />
 
           <Column
             field="timestamp"
@@ -285,12 +299,19 @@ const Product = () => {
             filterElement={dateFilterTemplate}
           />
 
-        
+          <Column
+            header="View Document"
+            body={(e) => actionBodyTemplate(e)}
+            exportable={false}
+           
+          ></Column>
         </DataTable>
+        
+
       </div>
     </div>
+   
   );
 };
 
 export default Product;
-

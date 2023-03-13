@@ -59,6 +59,7 @@ main {
 
 .link:hover {
   background: #203570;
+  /* border-radius: 10px !important; */
   /* background-size: 50px; */
   color: white;
   transition: all 0.5s;
@@ -66,6 +67,8 @@ main {
 
 .active {
   background: #203570;
+  /* border-radius: 10px !important; */
+ 
 
   color: white;
 }
@@ -93,7 +96,7 @@ main {
 
 .demo:hover {
   background-color: #203570 !important;
-
+  /* border-radius: 10px !important; */
   color: white !important;
 }
 .uploadButton {
@@ -183,11 +186,11 @@ input {
   padding: 1rem 1rem 1rem !important;
   font-weight: 700;
 }
-
+/* 
 .p-paginator .p-dropdown {
   margin-left: 0.5rem;
   height: 2rem !important;
-}
+} */
 
 .p-dropdown .p-dropdown-label.p-placeholder {
   color: #565b60;
@@ -242,7 +245,9 @@ input {
 .p-unselectable-text {
   height: 40px !important;
   margin-top: -10px;
+  
 }
+
 
 .tabview-header {
   /* padding: 2px; */

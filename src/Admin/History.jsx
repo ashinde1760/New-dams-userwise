@@ -7,7 +7,7 @@ import { Dropdown } from "primereact/dropdown";
 import { Button } from "primereact/button";
 import { Calendar } from "primereact/calendar";
 import { CustomerService } from "../service/CustomerService";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../App.css";
 
@@ -139,13 +139,7 @@ export default function AuditHistory ()  {
     }).format(currentTimestamp);
     // console.log(date, "'dsjcfsdjkshivani");
     return date;
-    // let timestamp
-    // const date = new Date(timestamp)
-    // // const date6 = moment().subtract(10, 'days').calendar(); // 02/04/2023
-    // const formatDate = moment(date).format("DD/MM/YYYY")
-    // return(
-    //   <div>{formatDate}</div>
-    // )
+   
   };
 
   const dateFilterTemplate = (options) => {
